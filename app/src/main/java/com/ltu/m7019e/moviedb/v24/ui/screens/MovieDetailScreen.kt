@@ -15,10 +15,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ltu.m7019e.moviedb.v24.model.Movie
+import com.ltu.m7019e.moviedb.v24.model.MovieDetail
 import com.ltu.m7019e.moviedb.v24.utils.Constants
 
 @Composable
-fun MovieDetailScreen(movie: Movie,
+fun MovieDetailScreen(movie: Movie, movieDetail: MovieDetail,
                       modifier: Modifier = Modifier) {
     Column {
         Box {
@@ -39,5 +40,14 @@ fun MovieDetailScreen(movie: Movie,
             overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.size(8.dp))
+        val genresText = movieDetail.genres.joinToString(", ")
+        Text(text = genresText, style = MaterialTheme.typography.bodySmall)
     }
 }
+/*@Composable
+fun MovieDetailGenre(movieDetail: MovieDetail,
+                      modifier: Modifier = Modifier) {
+    val genresText = movieDetail.genres.joinToString(", ")
+    Text(text = genresText, style = MaterialTheme.typography.bodySmall)
+
+}*/

@@ -111,6 +111,7 @@ fun TheMovieDBApp(
                 uiState.selectedMovie?.let { it1 ->
                     MovieDetailScreen(
                         movie = it1,
+                        movieDetail = ,
                         modifier = Modifier
                     )
                 }
