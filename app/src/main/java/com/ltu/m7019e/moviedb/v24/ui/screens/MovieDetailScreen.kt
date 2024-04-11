@@ -6,9 +6,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -48,7 +50,8 @@ fun MovieDetailScreen(movie: Movie, movieDetail: MovieDetail,
         )
         Spacer(modifier = Modifier.size(8.dp))
         MovieDetailGenre(movieDetail = movieDetail)
-        WebPageButton(movieDetail= movieDetail)
+        WebPageButton(urlPath = movieDetail.homepage, placeHolder = "Visit Homepage")
+        WebPageButton(urlPath = "https://www.imdb.com/title/${movieDetail.imdbid}/", placeHolder = "Visit IMDB Page")
     }
 }
 @Composable
@@ -60,15 +63,21 @@ fun MovieDetailGenre(movieDetail: MovieDetail,
 }
 
 @Composable
-fun WebPageButton(movieDetail: MovieDetail,
-                  modifier: Modifier = Modifier){
+fun WebPageButton(urlPath: String, placeHolder: String, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    Button(onClick = {
-        val uri = Uri.parse(movieDetail.homepage)
-        val intent = Intent(Intent.ACTION_VIEW, uri)
 
-        startActivity(context, intent, null)
-    }) {
-        Text(text = "Visit Website")
+    Button(
+        onClick = {
+            val uri = Uri.parse(urlPath)
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+
+            context.startActivity(intent)
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(text = placeHolder)
     }
 }
