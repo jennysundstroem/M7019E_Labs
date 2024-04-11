@@ -28,7 +28,7 @@ import com.ltu.m7019e.moviedb.v24.model.MovieDetail
 import com.ltu.m7019e.moviedb.v24.utils.Constants
 
 @Composable
-fun MovieDetailScreen(movie: Movie, movieDetail: MovieDetail,
+fun MovieDetailScreen(movie: Movie, movieDetail: MovieDetail, onMoviewReviewClicked : (Movie) -> Unit,
                       modifier: Modifier = Modifier) {
     Column {
         Box {
@@ -52,6 +52,12 @@ fun MovieDetailScreen(movie: Movie, movieDetail: MovieDetail,
         MovieDetailGenre(movieDetail = movieDetail)
         WebPageButton(urlPath = movieDetail.homepage, placeHolder = "Visit Homepage")
         WebPageButton(urlPath = "https://www.imdb.com/title/${movieDetail.imdbid}/", placeHolder = "Visit IMDB Page")
+
+        Button(
+            onClick = { onMoviewReviewClicked(movie) }
+        ){
+            Text(text = "Reviews")
+        }
     }
 }
 @Composable

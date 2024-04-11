@@ -35,7 +35,8 @@ import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 
 enum class MovieDBScreen(@StringRes val title: Int) {
     List(title = R.string.app_name),
-    Detail(title = R.string.movie_Detail)
+    Detail(title = R.string.movie_Detail),
+    Reviews(title = R.string.movie_reviews)
 }
 
 
@@ -112,9 +113,20 @@ fun TheMovieDBApp(
                         MovieDetailScreen(
                             movie = selectedMovie,
                             movieDetail = selectedMovieDetail,
+                            onMoviewReviewClicked = { movie ->
+                                viewModel.setSelectedMovie(movie)
+                                navController.navigate(MovieDBScreen.Reviews.name)
+                            },
                             modifier = Modifier,
-                            //navController = navController // Pass the navController here
                         )
+                    }
+                }
+            }
+            composable(route = MovieDBScreen.Reviews.name) {
+                uiState.selectedMovie?.let { selectedMovie ->
+                    uiState.selectedMovieDetail?.let { selectedMovieDetail ->
+                        Text(text = "You are at Reviews for ${selectedMovie.title}")
+
                     }
                 }
             }
