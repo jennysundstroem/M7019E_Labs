@@ -16,4 +16,7 @@ data class MovieResponse(
 
     @SerialName(value = "total_results")
     var total_results: Int = 0,
+
+    @SerialName(value = "genres")
+    var genres: Int = 0,
 )

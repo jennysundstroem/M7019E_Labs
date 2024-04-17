@@ -1,7 +1,6 @@
 package com.ltu.m7019e.moviedb.v24
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,10 +14,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,10 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.ltu.m7019e.movidedb.v24.database.Movies
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieDetailScreen
-//import com.ltu.m7019e.moviedb.v24.database.Movies
-//import com.ltu.m7019e.moviedb.v24.ui.screens.MovieDetailScreen
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieListScreen
 import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 
@@ -69,7 +63,6 @@ fun MovieDBAppBar(
 
 @Composable
 fun MovieDBApp(
-    viewModel: MovieDBViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ){
     val backStackEntry by navController.currentBackStackEntryAsState()

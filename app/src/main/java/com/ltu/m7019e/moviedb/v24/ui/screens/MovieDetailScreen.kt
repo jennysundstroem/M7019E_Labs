@@ -62,6 +62,21 @@ fun MovieDetailScreen(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = selectedMovieUiState.movieDetail.toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    )
+                /*
+                MovieDetailGenre(selectedMovieUiState.movieDetail)
+                WebPageButton(urlPath = movieDetail.homepage, placeHolder = "Visit Homepage")
+                WebPageButton(urlPath = "https://www.imdb.com/title/$%7BmovieDetail.imdbid%7D/", placeHolder = "Visit IMDB Page")
+
+                Button(
+                    onClick = { onMoviewReviewClicked(movie) }
+                ){
+                    Text(text = "Reviews")
+                }
+            } */
             }
         }
         is SelectedMovieUiState.Loading -> {

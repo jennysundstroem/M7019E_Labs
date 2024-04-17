@@ -16,7 +16,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface SelectedMovieUiState {
-    data class Success(val movie: Movie) : SelectedMovieUiState
+    data class Success(val movie: Movie, val movieDetail: Unit) : SelectedMovieUiState
     object Error : SelectedMovieUiState
     object Loading : SelectedMovieUiState
 }
@@ -65,11 +65,29 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
         }
     }
 
+    fun getMovieDetail(movieId: Long) {
+        viewModelScope.launch {
+            var movieDetail = try {
+                // Call getMovieDetail() with the provided movieId
+                val movieDetailResponse = moviesRepository.getMovieDetail(movieId)
+
+                // Create a MovieDetailResponse object with the retrieved data
+
+            } catch (e: IOException) {
+                MovieListUiState.Error
+            } catch (e: HttpException) {
+                MovieListUiState.Error
+            }
+        }
+    }
+
+
     fun setSelectedMovie(movie: Movie) {
             viewModelScope.launch {
                 selectedMovieUiState = SelectedMovieUiState.Loading
+                val movieDetail = getMovieDetail(movie.id)
                 selectedMovieUiState = try {
-                    SelectedMovieUiState.Success(movie)
+                    SelectedMovieUiState.Success(movie, movieDetail)
                 } catch (e: IOException) {
                     SelectedMovieUiState.Error
                 } catch (e: HttpException) {

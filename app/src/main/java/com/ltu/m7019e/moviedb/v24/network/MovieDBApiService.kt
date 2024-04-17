@@ -1,5 +1,6 @@
 package com.ltu.m7019e.moviedb.v24.network
 
+import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieResponse
 import com.ltu.m7019e.moviedb.v24.utils.Constants
 import retrofit2.http.GET
@@ -17,4 +18,9 @@ interface MovieDBApiService {
         @Query("api_key")
         apiKey: String = Constants.API_KEY
     ): MovieResponse
+    @GET("details")
+    suspend fun getMovieDetail(
+        @Query("id") id: Long,
+        @Query("api_key") apiKey: String = Constants.API_KEY
+    ): MovieDetailResponse
 }
