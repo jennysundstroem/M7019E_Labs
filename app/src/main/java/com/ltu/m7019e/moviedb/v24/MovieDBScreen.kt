@@ -35,7 +35,7 @@ import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 
 enum class MovieDBScreen(@StringRes val title: Int) {
     List(title = R.string.app_name),
-    Detail(title = R.string.movie_Detail),
+    Detail(title = R.string.movie_detail),
     Reviews(title = R.string.movie_reviews)
 }
 
@@ -68,7 +68,7 @@ fun MovieDBAppBar(
 }
 
 @Composable
-fun TheMovieDBApp(
+fun MovieDBApp(
     viewModel: MovieDBViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ){
@@ -87,7 +87,7 @@ fun TheMovieDBApp(
             )
         }
     ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+        val movieDBViewModel: MovieDBViewModel = viewModel(factory = MovieDBViewModel.Factory)
 
         NavHost(navController = navController,
             startDestination = MovieDBScreen.List.name,
@@ -97,9 +97,9 @@ fun TheMovieDBApp(
         ) {
             composable(route = MovieDBScreen.List.name) {
                 MovieListScreen(
-                    movieList = Movies().getMovies(),
-                    onMovieListItemClicked = { movie ->
-                        viewModel.setSelectedMovie(movie)
+                    movieListUiState = movieDBViewModel.movieListUiState,
+                    onMovieListItemClicked = {
+                        movieDBViewModel.setSelectedMovie(it)
                         navController.navigate(MovieDBScreen.Detail.name)
                     },
                     modifier = Modifier
@@ -108,27 +108,16 @@ fun TheMovieDBApp(
                 )
             }
             composable(route = MovieDBScreen.Detail.name) {
-                uiState.selectedMovie?.let { selectedMovie ->
-                    uiState.selectedMovieDetail?.let { selectedMovieDetail ->
-                        MovieDetailScreen(
-                            movie = selectedMovie,
-                            movieDetail = selectedMovieDetail,
-                            onMoviewReviewClicked = { movie ->
-                                viewModel.setSelectedMovie(movie)
-                                navController.navigate(MovieDBScreen.Reviews.name)
-                            },
-                            modifier = Modifier,
+                MovieDetailScreen(
+                    selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
+                    modifier = Modifier
                         )
                     }
-                }
-            }
             composable(route = MovieDBScreen.Reviews.name) {
-                uiState.selectedMovie?.let { selectedMovie ->
-                    uiState.selectedMovieDetail?.let { selectedMovieDetail ->
-                        Text(text = "You are at Reviews for ${selectedMovie.title}")
-
-                    }
-                }
+                MovieDetailScreen(
+                    selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
+                    modifier = Modifier
+                )
             }
         }
     }

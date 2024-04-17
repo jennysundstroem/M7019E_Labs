@@ -24,33 +24,61 @@ import coil.compose.AsyncImage
 import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.ui.theme.TheMovieDBV24Theme
 import com.ltu.m7019e.moviedb.v24.utils.Constants
+import com.ltu.m7019e.moviedb.v24.viewmodel.MovieListUiState
 
 @Composable
-fun MovieListScreen(movieList: List<Movie>,
+fun MovieListScreen(movieListUiState: MovieListUiState,
                     onMovieListItemClicked: (Movie) -> Unit,
-                    modifier: Modifier = Modifier){
-    LazyColumn (modifier = modifier){
-        items(movieList){ movie ->
-            MovieListItemCard(
-                movie = movie,
-                onMovieListItemClicked,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
+                    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
 
+        when(movieListUiState) {
+            is MovieListUiState.Success -> {
+                items(movieListUiState.movies) { movie ->
+                    MovieListItemCard(
+                        movie = movie,
+                        onMovieListItemClicked,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+
+            is MovieListUiState.Loading -> {
+                item {
+                    Text(
+                        text = "Loading...",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            is MovieListUiState.Error -> {
+                item {
+                    Text(
+                        text = "Error: Something went wrong!",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieListItemCard(
-    movie : Movie,
-    onMovieListItemClicked: (Movie) -> Unit,
-    modifier: Modifier = Modifier){
-    Card(modifier = modifier,
+fun MovieListItemCard(movie: Movie,
+                      onMovieListItemClicked: (Movie) -> Unit,
+                      modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
         onClick = {
             onMovieListItemClicked(movie)
-        }) {
+        }
+    ) {
         Row {
             Box {
                 AsyncImage(
@@ -63,15 +91,22 @@ fun MovieListItemCard(
                 )
             }
             Column {
-                Text(text = movie.title, style = MaterialTheme.typography.headlineSmall)
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.headlineSmall
+                )
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(text = movie.releaseDate, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = movie.releaseDate,
+                    style = MaterialTheme.typography.bodySmall
+                )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
                     text = movie.overview,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 3,
-                    overflow = TextOverflow.Ellipsis)
+                    overflow = TextOverflow.Ellipsis,
+                )
                 Spacer(modifier = Modifier.size(8.dp))
             }
         }
