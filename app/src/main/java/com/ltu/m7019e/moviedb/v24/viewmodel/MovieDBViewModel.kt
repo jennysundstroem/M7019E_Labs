@@ -11,12 +11,13 @@ import androidx.lifecycle.viewmodel.initializer
 import com.ltu.m7019e.moviedb.v24.MovieDBApplication
 import com.ltu.m7019e.moviedb.v24.database.MoviesRepository
 import com.ltu.m7019e.moviedb.v24.model.Movie
+import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface SelectedMovieUiState {
-    data class Success(val movie: Movie, val movieDetail: Unit) : SelectedMovieUiState
+    data class Success(val movie: Movie, val movieDetail: MovieDetailResponse) : SelectedMovieUiState
     object Error : SelectedMovieUiState
     object Loading : SelectedMovieUiState
 }
