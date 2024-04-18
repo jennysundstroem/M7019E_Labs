@@ -66,29 +66,12 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
         }
     }
 
-    fun getMovieDetail(movieId: Long) {
-        viewModelScope.launch {
-            var movieDetail = try {
-                // Call getMovieDetail() with the provided movieId
-                val movieDetailResponse = moviesRepository.getMovieDetail(movieId)
-
-                // Create a MovieDetailResponse object with the retrieved data
-
-            } catch (e: IOException) {
-                MovieListUiState.Error
-            } catch (e: HttpException) {
-                MovieListUiState.Error
-            }
-        }
-    }
-
 
     fun setSelectedMovie(movie: Movie) {
             viewModelScope.launch {
                 selectedMovieUiState = SelectedMovieUiState.Loading
-                val movieDetail = getMovieDetail(movie.id)
                 selectedMovieUiState = try {
-                    SelectedMovieUiState.Success(movie, movieDetail)
+                    SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id))
                 } catch (e: IOException) {
                     SelectedMovieUiState.Error
                 } catch (e: HttpException) {

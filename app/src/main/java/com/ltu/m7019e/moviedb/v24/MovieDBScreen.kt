@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieDetailScreen
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieListScreen
+import com.ltu.m7019e.moviedb.v24.ui.screens.MovieReviewsScreen
 import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 
 enum class MovieDBScreen(@StringRes val title: Int) {
@@ -103,11 +104,15 @@ fun MovieDBApp(
             composable(route = MovieDBScreen.Detail.name) {
                 MovieDetailScreen(
                     selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
-                    modifier = Modifier
-                        )
+                    modifier = Modifier,
+                    onMoviewReviewClicked = {
+                        movieDBViewModel.setSelectedMovie(it)
+                        navController.navigate(MovieDBScreen.Reviews.name)
+                    },
+                )
                     }
             composable(route = MovieDBScreen.Reviews.name) {
-                MovieDetailScreen(
+                MovieReviewsScreen(
                     selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
                     modifier = Modifier
                 )

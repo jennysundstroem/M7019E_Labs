@@ -26,13 +26,15 @@ import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetail
+import com.ltu.m7019e.moviedb.v24.model.MovieGenre
 import com.ltu.m7019e.moviedb.v24.utils.Constants
 import com.ltu.m7019e.moviedb.v24.viewmodel.SelectedMovieUiState
 
 @Composable
 fun MovieDetailScreen(
     selectedMovieUiState: SelectedMovieUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMoviewReviewClicked : (Movie) -> Unit,
 ) {
     when (selectedMovieUiState) {
         is SelectedMovieUiState.Success -> {
@@ -63,6 +65,16 @@ fun MovieDetailScreen(
                 )
                 Spacer(modifier = Modifier.size(8.dp))
 
+                MovieDetailGenre(selectedMovieUiState.movieDetail.genres)
+                WebPageButton(urlPath = selectedMovieUiState.movieDetail.homepage, placeHolder = "Visit Homepage")
+                WebPageButton(urlPath = "https://www.imdb.com/title/${selectedMovieUiState.movieDetail.imdb_id}/", placeHolder = "Visit IMDB Page")
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Button(
+                    onClick = { onMoviewReviewClicked(selectedMovieUiState.movie) }
+                ){
+                    Text(text = "Reviews")
+                }
             }
         }
         is SelectedMovieUiState.Loading -> {
@@ -81,24 +93,32 @@ fun MovieDetailScreen(
         }
     }
 }
+@Composable
+fun MovieDetailGenre(genreList: List<MovieGenre>,
+                     modifier: Modifier = Modifier) {
+    val genresText = genreList.joinToString(", ") { it.name }
+    Text(text = "Genres:" + genresText, style = MaterialTheme.typography.bodySmall)
+    Spacer(modifier = Modifier.size(8.dp))
+}
 
+@Composable
+fun WebPageButton(urlPath: String, placeHolder: String, modifier: Modifier = Modifier) {
+    if (urlPath.isNotEmpty()) {
+        val context = LocalContext.current
 
-/*
-*
-*                 /*
-                Text(
-                    text = selectedMovieUiState.movieDetail.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    )
+        Button(
+            onClick = {
+                val uri = Uri.parse(urlPath)
+                val intent = Intent(Intent.ACTION_VIEW, uri)
 
-                MovieDetailGenre(selectedMovieUiState.movieDetail)
-                WebPageButton(urlPath = movieDetail.homepage, placeHolder = "Visit Homepage")
-                WebPageButton(urlPath = "https://www.imdb.com/title/$%7BmovieDetail.imdbid%7D/", placeHolder = "Visit IMDB Page")
-
-                Button(
-                    onClick = { onMoviewReviewClicked(movie) }
-                ){
-                    Text(text = "Reviews")
-                }
-            } */
-* */
+                context.startActivity(intent)
+            },
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(text = placeHolder)
+        }
+    }
+}
