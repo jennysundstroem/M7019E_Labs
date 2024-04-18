@@ -13,8 +13,8 @@ data class MovieDetailResponse(
     var genres: List<MovieGenre> = listOf(),
 
     @SerialName(value = "homepage")
-    var homepage: String = "",
+    var homepage: String,
 
     @SerialName(value = "imdb_id")
-    var imdb_id: String = "",
+    var imdb_id: String,
 )

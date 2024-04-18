@@ -7,7 +7,6 @@ import com.ltu.m7019e.moviedb.v24.network.MovieDBApiService
 interface MoviesRepository {
     suspend fun getPopularMovies(): MovieResponse
     suspend fun getTopRatedMovies(): MovieResponse
-
     suspend fun getMovieDetail(movieId: Long): MovieDetailResponse
 }
 
