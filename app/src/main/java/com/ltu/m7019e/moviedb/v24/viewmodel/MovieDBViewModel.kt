@@ -20,12 +20,9 @@ import java.io.IOException
 
 sealed interface SelectedMovieUiState {
     data class Success(
-        
         val movie: Movie,
-       
         val movieDetail: MovieDetailResponse,
-        val videos: List<MovieVideo>
-    ,
+        val videos: List<MovieVideo>,
         val movieReviews: List<MovieReview>
     )
         : SelectedMovieUiState
@@ -82,13 +79,9 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
             viewModelScope.launch {
                 selectedMovieUiState = SelectedMovieUiState.Loading
                 selectedMovieUiState = try {
-                    val movieReviewsResponse = moviesRepository.getMovieReviews(movie.id)
-                    println("Movie Reviews Response: $movieReviewsResponse")
-                    SelectedMovieUiState.Success(
-                        movie,
-                        moviesRepository.getMovieDetail(movie.id),
-                        moviesRepository.getMovieReviews(movie.id).results
-                    , moviesRepository.getVideos(movie.id).results)
+                    SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id),
+                        moviesRepository.getVideos(movie.id).results, moviesRepository.getMovieReviews(movie.id).results)
+
                 } catch (e: IOException) {
                     SelectedMovieUiState.Error
                 } catch (e: HttpException) {

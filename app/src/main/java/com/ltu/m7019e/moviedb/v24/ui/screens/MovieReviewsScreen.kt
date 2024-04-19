@@ -66,6 +66,14 @@ fun MovieReviewsScreen(
                     textAlign = TextAlign.Center
                 )
                 MovieReviewList(reviews = selectedMovieUiState.movieReviews)
+                Text(
+                    text = "Videos",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+
+                VideoList(videos = selectedMovieUiState.videos, modifier = modifier)
             }
         }
         is SelectedMovieUiState.Loading -> {
@@ -127,37 +135,11 @@ fun MovieReviewItem(review: MovieReview) {
             color = Color.Black,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.size(8.dp))
+
     }
 }
 
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "Videos",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-                VideoList(videos = selectedMovieUiState.videos, modifier = modifier)
-            }
-            is SelectedMovieUiState.Loading -> {
-                Text(
-                    text = "Loading...",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            is SelectedMovieUiState.Error -> {
-                Text(
-                    text = "Error...",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun VideoList(videos: List<MovieVideo>, modifier: Modifier = Modifier) {
