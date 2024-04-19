@@ -12,12 +12,18 @@ import com.ltu.m7019e.moviedb.v24.MovieDBApplication
 import com.ltu.m7019e.moviedb.v24.database.MoviesRepository
 import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
+import com.ltu.m7019e.moviedb.v24.model.MovieVideo
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface SelectedMovieUiState {
-    data class Success(val movie: Movie, val movieDetail: MovieDetailResponse) : SelectedMovieUiState
+    data class Success(
+        val movie: Movie,
+        val movieDetail: MovieDetailResponse,
+        val videos: List<MovieVideo>
+    ) : SelectedMovieUiState
+
     object Error : SelectedMovieUiState
     object Loading : SelectedMovieUiState
 }
@@ -66,12 +72,11 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
         }
     }
 
-
     fun setSelectedMovie(movie: Movie) {
             viewModelScope.launch {
                 selectedMovieUiState = SelectedMovieUiState.Loading
                 selectedMovieUiState = try {
-                    SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id))
+                    SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id), moviesRepository.getVideos(movie.id).results)
                 } catch (e: IOException) {
                     SelectedMovieUiState.Error
                 } catch (e: HttpException) {

@@ -2,6 +2,7 @@ package com.ltu.m7019e.moviedb.v24.database
 
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieResponse
+import com.ltu.m7019e.moviedb.v24.model.MovieVideoResponse
 import com.ltu.m7019e.moviedb.v24.network.MovieDBApiService
 
 interface MoviesRepository {
@@ -9,6 +10,8 @@ interface MoviesRepository {
     suspend fun getTopRatedMovies(): MovieResponse
 
     suspend fun getMovieDetail(movieId: Long): MovieDetailResponse
+
+    suspend fun getVideos(movieId: Long): MovieVideoResponse
 }
 
 class NetworkMoviesRepository(private val apiService: MovieDBApiService) : MoviesRepository {
@@ -22,5 +25,9 @@ class NetworkMoviesRepository(private val apiService: MovieDBApiService) : Movie
 
     override suspend fun getMovieDetail(movieId: Long): MovieDetailResponse {
         return apiService.getMovieDetail(movieId)
+    }
+
+    override suspend fun getVideos(movieId: Long): MovieVideoResponse {
+        return apiService.getVideos(movieId)
     }
 }
