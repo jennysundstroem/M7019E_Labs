@@ -78,7 +78,6 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
                 selectedMovieUiState = SelectedMovieUiState.Loading
                 selectedMovieUiState = try {
                     val movieReviewsResponse = moviesRepository.getMovieReviews(movie.id)
-                    // Log the response
                     println("Movie Reviews Response: $movieReviewsResponse")
                     SelectedMovieUiState.Success(
                         movie,

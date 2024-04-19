@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,20 +17,24 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.vectorResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieDetailScreen
+import com.ltu.m7019e.moviedb.v24.ui.screens.MovieListGridScreen
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieListScreen
 import com.ltu.m7019e.moviedb.v24.ui.screens.MovieReviewsScreen
 import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 
 enum class MovieDBScreen(@StringRes val title: Int) {
     List(title = R.string.app_name),
+    ListGrid(title = R.string.app_name ),
     Detail(title = R.string.movie_detail),
     Reviews(title = R.string.movie_reviews)
 }
@@ -41,6 +46,7 @@ fun MovieDBAppBar(
     currentScreen: MovieDBScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
+    switchScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -56,6 +62,25 @@ fun MovieDBAppBar(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
                     )
+                }
+            }
+        },
+        actions = {
+            if(currentScreen == MovieDBScreen.List || currentScreen == MovieDBScreen.ListGrid) {
+
+                IconButton(onClick = switchScreen) {
+                    if (currentScreen == MovieDBScreen.List) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_grid_view_24),
+                            contentDescription = ("Switch Screens")
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.List,
+                            contentDescription = ("Switch Screens")
+                        )
+                    }
+
                 }
             }
         }
@@ -77,7 +102,14 @@ fun MovieDBApp(
             MovieDBAppBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigateUp() },
+                        switchScreen = {
+                    navController.navigate(
+                        if (currentScreen == MovieDBScreen.List)
+                            MovieDBScreen.ListGrid.name
+                        else MovieDBScreen.List.name
+                    )
+                }
             )
         }
     ) { innerPadding ->
@@ -101,6 +133,19 @@ fun MovieDBApp(
                         .padding(16.dp)
                 )
             }
+
+                composable(route = MovieDBScreen.ListGrid.name) {
+                    MovieListGridScreen(
+                        movieListUiState = movieDBViewModel.movieListUiState,
+                        onMovieListItemClicked = {
+                            movieDBViewModel.setSelectedMovie(it)
+                            navController.navigate(MovieDBScreen.Detail.name)
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    )
+                }
             composable(route = MovieDBScreen.Detail.name) {
                 MovieDetailScreen(
                     selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
