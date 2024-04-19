@@ -2,6 +2,7 @@ package com.ltu.m7019e.moviedb.v24.network
 
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieResponse
+import com.ltu.m7019e.moviedb.v24.model.MovieReviewResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
 import com.ltu.m7019e.moviedb.v24.model.MovieVideoResponse
 import com.ltu.m7019e.moviedb.v24.utils.Constants
@@ -26,6 +27,12 @@ interface MovieDBApiService {
         @Path("movie_id") id: Long,
         @Query("api_key") apiKey: String = Constants.API_KEY
     ): MovieDetailResponse
+
+    @GET("{movie_id}/reviews")
+    suspend fun getMovieReviews(
+        @Path("movie_id") id: Long,
+        @Query("api_key") apiKey: String = Constants.API_KEY
+    ): MovieReviewResponse
     @GET("{movie_id}/videos")
     suspend fun getVideos(
         @Path("movie_id") id: Long,
