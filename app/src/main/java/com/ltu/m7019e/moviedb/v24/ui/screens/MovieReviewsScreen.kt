@@ -45,6 +45,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
 import com.ltu.m7019e.moviedb.v24.utils.Constants.YOUTUBE_VIDEO_BASE_URL
+import com.ltu.m7019e.moviedb.v24.utils.Constants.YOUTUBE_VIDEO_EMBEDDED_URL
 
 
 @Composable
@@ -151,7 +152,7 @@ fun VideoList(videos: List<MovieVideo>, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
-                ExoPlayerView(urlPath = YOUTUBE_VIDEO_BASE_URL + video.key)
+                ExoPlayerView(urlPath = YOUTUBE_VIDEO_EMBEDDED_URL + video.key)
                 VideoButton(urlPath = YOUTUBE_VIDEO_BASE_URL + video.key, placeHolder = "Watch on Youtube")
             }
         }
