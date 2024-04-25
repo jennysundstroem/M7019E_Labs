@@ -4,10 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.Switch
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,14 +30,17 @@ import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetail
 import com.ltu.m7019e.moviedb.v24.model.MovieGenre
 import com.ltu.m7019e.moviedb.v24.utils.Constants
+import com.ltu.m7019e.moviedb.v24.viewmodel.MovieDBViewModel
 import com.ltu.m7019e.moviedb.v24.viewmodel.SelectedMovieUiState
 
 @Composable
 fun MovieDetailScreen(
+    movieDBViewModel: MovieDBViewModel,
     selectedMovieUiState: SelectedMovieUiState,
     modifier: Modifier = Modifier,
     onMoviewReviewClicked : (Movie) -> Unit,
 ) {
+    val selectedMovieUiState = movieDBViewModel.selectedMovieUiState
     when (selectedMovieUiState) {
         is SelectedMovieUiState.Success -> {
             Column(Modifier.width(IntrinsicSize.Max)) {
@@ -66,15 +71,26 @@ fun MovieDetailScreen(
                 Spacer(modifier = Modifier.size(8.dp))
 
                 MovieDetailGenre(selectedMovieUiState.movieDetail.genres)
-                WebPageButton(urlPath = selectedMovieUiState.movieDetail.homepage, placeHolder = "Visit Homepage")
-                WebPageButton(urlPath = "https://www.imdb.com/title/${selectedMovieUiState.movieDetail.imdb_id}/", placeHolder = "Visit IMDB Page")
+                WebPageButton(
+                    urlPath = selectedMovieUiState.movieDetail.homepage,
+                    placeHolder = "Visit Homepage"
+                )
+                WebPageButton(
+                    urlPath = "https://www.imdb.com/title/${selectedMovieUiState.movieDetail.imdb_id}/",
+                    placeHolder = "Visit IMDB Page"
+                )
                 Spacer(modifier = Modifier.size(8.dp))
-
                 Button(
                     onClick = { onMoviewReviewClicked(selectedMovieUiState.movie) }
                 ){
                     Text(text = "Reviews")
                 }
+                Switch(checked = selectedMovieUiState.isFavourite, onCheckedChange = {
+                    if (it)
+                        movieDBViewModel.saveMovie(selectedMovieUiState.movie)
+                    else
+                        movieDBViewModel.deleteMovie(selectedMovieUiState.movie)
+                })
             }
         }
         is SelectedMovieUiState.Loading -> {
