@@ -74,6 +74,7 @@ fun MovieReviewsScreen(
                 Spacer(modifier = Modifier.size(8.dp))
 
                 VideoList(videos = selectedMovieUiState.videos, modifier = modifier)
+
             }
         }
         is SelectedMovieUiState.Loading -> {
@@ -151,7 +152,7 @@ fun VideoList(videos: List<MovieVideo>, modifier: Modifier = Modifier) {
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
-                ExoPlayerView(urlPath = YOUTUBE_VIDEO_BASE_URL + video.key)
+                ExoPlayerView(urlPath = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                 VideoButton(urlPath = YOUTUBE_VIDEO_BASE_URL + video.key, placeHolder = "Watch on Youtube")
             }
         }

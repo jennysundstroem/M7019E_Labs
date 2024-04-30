@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Switch
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,7 +46,10 @@ fun MovieDetailScreen(
     when (selectedMovieUiState) {
         is SelectedMovieUiState.Success -> {
             Column(Modifier.width(IntrinsicSize.Max)) {
-                Box(Modifier.fillMaxWidth().padding(0.dp)) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp)) {
                     AsyncImage(
                         model = Constants.BACKDROP_IMAGE_BASE_URL + Constants.BACKDROP_IMAGE_WIDTH + selectedMovieUiState.movie.backdropPath,
                         contentDescription = selectedMovieUiState.movie.title,
@@ -71,26 +76,47 @@ fun MovieDetailScreen(
                 Spacer(modifier = Modifier.size(8.dp))
 
                 MovieDetailGenre(selectedMovieUiState.movieDetail.genres)
-                WebPageButton(
-                    urlPath = selectedMovieUiState.movieDetail.homepage,
-                    placeHolder = "Visit Homepage"
-                )
-                WebPageButton(
-                    urlPath = "https://www.imdb.com/title/${selectedMovieUiState.movieDetail.imdb_id}/",
+                Row(modifier = modifier,
+                    horizontalArrangement = Arrangement.SpaceAround){
+                    WebPageButton(
+                        urlPath = selectedMovieUiState.movieDetail.homepage,
+                        placeHolder = "Visit Homepage"
+                    )
+                    WebPageButton(
+                        urlPath = "https://www.imdb.com/title/${selectedMovieUiState.movieDetail.imdb_id}/",
                     placeHolder = "Visit IMDB Page"
-                )
+                    )
+
+                }
+
+
                 Spacer(modifier = Modifier.size(8.dp))
                 Button(
                     onClick = { onMoviewReviewClicked(selectedMovieUiState.movie) }
                 ){
                     Text(text = "Reviews")
                 }
-                Switch(checked = selectedMovieUiState.isFavourite, onCheckedChange = {
-                    if (it)
-                        movieDBViewModel.saveMovie(selectedMovieUiState.movie)
-                    else
-                        movieDBViewModel.deleteMovie(selectedMovieUiState.movie)
-                })
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Row(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Favourite",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Switch(
+                        checked = selectedMovieUiState.isFavourite,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                movieDBViewModel.saveMovie(selectedMovieUiState.movie)
+                            } else {
+                                movieDBViewModel.deleteMovie(selectedMovieUiState.movie)
+                            }
+                        }
+                    )
+                }
+
             }
         }
         is SelectedMovieUiState.Loading -> {
@@ -129,10 +155,7 @@ fun WebPageButton(urlPath: String, placeHolder: String, modifier: Modifier = Mod
 
                 context.startActivity(intent)
             },
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+
         ) {
             Text(text = placeHolder)
         }

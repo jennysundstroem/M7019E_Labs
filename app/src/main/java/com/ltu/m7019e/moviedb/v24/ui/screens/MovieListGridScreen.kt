@@ -38,7 +38,7 @@ fun MovieListGridScreen(
         modifier = modifier,
         columns = GridCells.Fixed(columns)
     ) {
-        when (movieListUiState) {
+        when(movieListUiState) {
             is MovieListUiState.Success -> {
                 items(movieListUiState.movies) { movie ->
                     MovieListGridItem(

@@ -63,6 +63,22 @@ fun MovieDBAppBar(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         actions = {
+            if(currentScreen == MovieDBScreen.List || currentScreen == MovieDBScreen.ListGrid) {
+                IconButton(onClick = switchScreen) {
+                    if (currentScreen == MovieDBScreen.List) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_grid_view_24),
+                            contentDescription = ("Switch Screens")
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.List,
+                            contentDescription = ("Switch Screens")
+                        )
+                    }
+
+                }
+            }
             IconButton(onClick = {
                 // Set the menu expanded state to the opposite of the current state
                 menuExpanded = !menuExpanded
@@ -72,6 +88,7 @@ fun MovieDBAppBar(
                     contentDescription = "Open Menu to select different movie lists"
                 )
             }
+
             DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                 DropdownMenuItem(
                     onClick = {
@@ -121,25 +138,8 @@ fun MovieDBAppBar(
                     )
                 }
             }
-        },
-        /* actions = {
-            if(currentScreen == MovieDBScreen.List || currentScreen == MovieDBScreen.ListGrid) {
-                IconButton(onClick = switchScreen) {
-                    if (currentScreen == MovieDBScreen.List) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.baseline_grid_view_24),
-                            contentDescription = ("Switch Screens")
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.List,
-                            contentDescription = ("Switch Screens")
-                        )
-                    }
+        }
 
-                }
-            }
-        } */
     )
 }
 
@@ -166,7 +166,16 @@ fun MovieDBApp(
                         if (currentScreen == MovieDBScreen.List)
                             MovieDBScreen.ListGrid.name
                         else MovieDBScreen.List.name
-                    )
+                    ){
+                        if (currentScreen == MovieDBScreen.List)
+                            popUpTo(MovieDBScreen.List.name) {
+                                inclusive = true
+                            }
+                        else
+                            popUpTo(MovieDBScreen.ListGrid.name) { inclusive = true }
+
+                    }
+
                 }
             )
         }
@@ -180,6 +189,7 @@ fun MovieDBApp(
                 .padding(innerPadding)
         ) {
             composable(route = MovieDBScreen.List.name) {
+
                 MovieListScreen(
                     movieListUiState = movieDBViewModel.movieListUiState,
                     onMovieListItemClicked = {
