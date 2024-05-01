@@ -5,9 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MovieDetailResponse(
-/*
-    @SerialName(value = "id")
-    var id: Int = 0, */
 
     @SerialName(value = "genres")
     var genres: List<MovieGenre> = listOf(),

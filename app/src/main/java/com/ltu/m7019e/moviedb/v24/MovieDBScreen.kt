@@ -44,8 +44,6 @@ enum class MovieDBScreen(@StringRes val title: Int) {
     Detail(title = R.string.movie_detail),
     Reviews(title = R.string.movie_reviews)
 }
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDBAppBar(
@@ -217,14 +215,12 @@ fun MovieDBApp(
             composable(route = MovieDBScreen.Detail.name) {
                 MovieDetailScreen(
                     movieDBViewModel = movieDBViewModel,
-                    selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
                     modifier = Modifier,
-                    onMoviewReviewClicked = {
-                        movieDBViewModel.setSelectedMovie(it)
-                        navController.navigate(MovieDBScreen.Reviews.name)
-                    },
-                )
-                    }
+                ) {
+                    movieDBViewModel.setSelectedMovie(it)
+                    navController.navigate(MovieDBScreen.Reviews.name)
+                }
+            }
             composable(route = MovieDBScreen.Reviews.name) {
                 MovieReviewsScreen(
                     selectedMovieUiState = movieDBViewModel.selectedMovieUiState,

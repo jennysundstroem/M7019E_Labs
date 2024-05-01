@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewmodel.initializer
 import com.ltu.m7019e.moviedb.v24.MovieDBApplication
-import com.ltu.m7019e.moviedb.v24.database.FavoriteMoviesRepository
 import com.ltu.m7019e.moviedb.v24.database.MoviesRepository
 import com.ltu.m7019e.moviedb.v24.database.SavedMovieRepository
 import com.ltu.m7019e.moviedb.v24.model.Movie
