@@ -1,11 +1,16 @@
 package com.ltu.m7019e.moviedb.v24.database
 
+import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieReviewResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieVideoResponse
 import com.ltu.m7019e.moviedb.v24.network.MovieDBApiService
+import com.ltu.m7019e.moviedb.v24.workers.ApiWorker
 
 interface MoviesRepository {
     suspend fun getPopularMovies(): MovieResponse
@@ -48,10 +53,12 @@ interface SavedMovieRepository {
     suspend fun deleteCachedMovies()
     suspend fun setFavouriteMovie(id: Long)
     suspend fun setCachedMovie(id: Long)
+    abstract fun scheduelApiWorker(action: String)
 
 }
 
-class FavoriteMoviesRepository(private val movieDao: MovieDao) : SavedMovieRepository {
+class FavoriteMoviesRepository(private val movieDao: MovieDao, context: Context) : SavedMovieRepository {
+    private val workManager = WorkManager.getInstance(context)
 
     override suspend fun getFavouriteMovies(): List<Movie> {
         return movieDao.getFavouriteMovies()
@@ -83,6 +90,13 @@ class FavoriteMoviesRepository(private val movieDao: MovieDao) : SavedMovieRepos
 
     override suspend fun setCachedMovie(id: Long) {
         return movieDao.setCachedMovie(id)
+    }
+    override fun scheduelApiWorker(action: String) {
+        val inputData = workDataOf("action" to action)
+        val workRequest = OneTimeWorkRequestBuilder<ApiWorker>()
+            .setInputData(inputData)
+            .build()
+        workManager.enqueue(workRequest)
     }
 
 }

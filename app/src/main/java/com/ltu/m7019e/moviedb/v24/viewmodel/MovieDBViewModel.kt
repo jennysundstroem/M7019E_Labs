@@ -1,5 +1,8 @@
 package com.ltu.m7019e.moviedb.v24.viewmodel
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,7 +42,7 @@ sealed interface MovieListUiState {
     object Loading : MovieListUiState
 }
 
-class MovieDBViewModel(private val moviesRepository: MoviesRepository, private val savedMovieRepository: SavedMovieRepository) : ViewModel() {
+class MovieDBViewModel(private val moviesRepository: MoviesRepository, private val savedMovieRepository: SavedMovieRepository, private val context: Context) : ViewModel() {
 
     var movieListUiState: MovieListUiState by mutableStateOf(MovieListUiState.Loading)
         private set
@@ -54,12 +57,23 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     fun getTopRatedMovies() {
         viewModelScope.launch {
             movieListUiState = MovieListUiState.Loading
-            movieListUiState = try {
-                MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
-            } catch (e: IOException) {
-                MovieListUiState.Error
-            } catch (e: HttpException) {
-                MovieListUiState.Error
+            if (isNetworkAvailable()) {
+                scheduleApiWorker("getTopRatedMovies")
+                movieListUiState = try {
+                    MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
+                } catch (e: IOException) {
+                    MovieListUiState.Error
+                } catch (e: HttpException) {
+                    MovieListUiState.Error
+                }
+            } else {
+                movieListUiState = try {
+                    MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+                } catch (e: IOException) {
+                    MovieListUiState.Error
+                } catch (e: HttpException) {
+                    MovieListUiState.Error
+                }
             }
         }
     }
@@ -67,12 +81,23 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     fun getPopularMovies() {
         viewModelScope.launch {
             movieListUiState = MovieListUiState.Loading
-            movieListUiState = try {
-                MovieListUiState.Success(moviesRepository.getPopularMovies().results)
-            } catch (e: IOException) {
-                MovieListUiState.Error
-            } catch (e: HttpException) {
-                MovieListUiState.Error
+            if (isNetworkAvailable()) {
+                scheduleApiWorker("getPopularMovies")
+                movieListUiState = try {
+                    MovieListUiState.Success(moviesRepository.getPopularMovies().results)
+                } catch (e: IOException) {
+                    MovieListUiState.Error
+                } catch (e: HttpException) {
+                    MovieListUiState.Error
+                }
+            } else {
+                movieListUiState = try {
+                    MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+                } catch (e: IOException) {
+                    MovieListUiState.Error
+                } catch (e: HttpException) {
+                    MovieListUiState.Error
+                }
             }
         }
     }
@@ -119,14 +144,24 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
                 }
             }
         }
-
+    fun scheduleApiWorker(action: String) {
+        savedMovieRepository.scheduelApiWorker(action)
+    }
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+        return networkCapabilities != null &&
+                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
         companion object {
             val Factory: ViewModelProvider.Factory = viewModelFactory {
                 initializer {
                     val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MovieDBApplication)
                     val moviesRepository = application.container.moviesRepository
                     val savedMovieRepository = application.container.savedMovieRepository
-                    MovieDBViewModel(moviesRepository = moviesRepository, savedMovieRepository = savedMovieRepository)
+                    MovieDBViewModel(moviesRepository = moviesRepository, savedMovieRepository = savedMovieRepository, context = application.applicationContext)
                 }
             }
         }

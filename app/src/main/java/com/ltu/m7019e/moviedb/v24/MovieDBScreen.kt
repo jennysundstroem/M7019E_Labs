@@ -104,6 +104,7 @@ fun MovieDBAppBar(
                     onClick = {
                         // Set the selected movie list to popular
                         movieDBViewModel.getTopRatedMovies()
+
                         // Set the menu expanded state to false
                         menuExpanded = false
 
