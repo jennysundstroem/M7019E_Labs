@@ -38,30 +38,51 @@ class NetworkMoviesRepository(private val apiService: MovieDBApiService) : Movie
 }
 
 interface SavedMovieRepository {
-    suspend fun getSavedMovies(): List<Movie>
+    suspend fun getFavouriteMovies(): List<Movie>
+    suspend fun getCachedMovies(): List<Movie>
 
     suspend fun insertMovie(movie: Movie)
 
     suspend fun getMovie(id: Long): Movie
+    suspend fun deleteFavouriteMovie(movie: Movie)
+    suspend fun deleteCachedMovies()
+    suspend fun setFavouriteMovie(id: Long)
+    suspend fun setCachedMovie(id: Long)
 
-    suspend fun deleteMovie(movie: Movie)
 }
 
 class FavoriteMoviesRepository(private val movieDao: MovieDao) : SavedMovieRepository {
-    override suspend fun getSavedMovies(): List<Movie> {
+
+    override suspend fun getFavouriteMovies(): List<Movie> {
         return movieDao.getFavouriteMovies()
     }
 
+    override suspend fun getCachedMovies(): List<Movie> {
+        return movieDao.getCachedMovies()
+    }
+
     override suspend fun insertMovie(movie: Movie) {
-        movieDao.insertFavouriteMovie(movie)
+        movieDao.insertMovie(movie)
     }
 
     override suspend fun getMovie(id: Long): Movie {
         return movieDao.getMovie(id)
     }
 
-    override suspend fun deleteMovie(movie: Movie) {
-        movieDao.deleteFavouriteMovie(movie.id)
+    override suspend fun deleteFavouriteMovie(movie: Movie) {
+        return movieDao.deleteFavouriteMovie(movie.id)
+    }
+
+    override suspend fun deleteCachedMovies() {
+        return movieDao.deleteCachedMovies()
+    }
+
+    override suspend fun setFavouriteMovie(id: Long) {
+        return movieDao.setFavouriteMovie(id)
+    }
+
+    override suspend fun setCachedMovie(id: Long) {
+        return movieDao.setCachedMovie(id)
     }
 
 }

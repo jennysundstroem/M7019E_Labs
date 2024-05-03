@@ -81,7 +81,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
         viewModelScope.launch {
             movieListUiState = MovieListUiState.Loading
             movieListUiState = try {
-                MovieListUiState.Success(savedMovieRepository.getSavedMovies())
+                MovieListUiState.Success(savedMovieRepository.getFavouriteMovies())
             } catch (e: IOException) {
                 MovieListUiState.Error
             } catch (e: HttpException) {
@@ -93,13 +93,14 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     fun saveMovie(movie: Movie) {
         viewModelScope.launch {
             savedMovieRepository.insertMovie(movie)
+            savedMovieRepository.setFavouriteMovie(movie.id)
             selectedMovieUiState = SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id), moviesRepository.getVideos(movie.id).results, moviesRepository.getMovieReviews(movie.id).results, isFavourite = true)
         }
     }
 
     fun deleteMovie(movie: Movie) {
         viewModelScope.launch {
-            savedMovieRepository.deleteMovie(movie)
+            savedMovieRepository.deleteFavouriteMovie(movie)
             selectedMovieUiState = SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id), moviesRepository.getVideos(movie.id).results, moviesRepository.getMovieReviews(movie.id).results, false)
         }
     }

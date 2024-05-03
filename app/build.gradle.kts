@@ -91,7 +91,7 @@ dependencies {
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation(libs.androidx.room.ktx)
     // WorkManager
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.work.runtime.ktx.v281)
 
 
 }
