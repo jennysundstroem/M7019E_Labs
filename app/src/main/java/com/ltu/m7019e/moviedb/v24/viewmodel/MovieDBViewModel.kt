@@ -18,6 +18,7 @@ import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieReview
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -50,7 +51,9 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     var selectedMovieUiState: SelectedMovieUiState by mutableStateOf(SelectedMovieUiState.Loading)
         private set
 
+    private var lastCached = "getPopularMovies"
     init {
+        scheduleApiWorker("getPopularMovies")
         getPopularMovies()
     }
 
@@ -59,6 +62,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
             movieListUiState = MovieListUiState.Loading
             if (isNetworkAvailable()) {
                 scheduleApiWorker("getTopRatedMovies")
+                lastCached = "getTopRatedMovies"
                 movieListUiState = try {
                     MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
                 } catch (e: IOException) {
@@ -67,12 +71,19 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
                     MovieListUiState.Error
                 }
             } else {
-                movieListUiState = try {
-                    MovieListUiState.Success(savedMovieRepository.getCachedMovies())
-                } catch (e: IOException) {
+                if(lastCached == "getTopRatedMovies"){
+                    movieListUiState = try {
+                        MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+                    } catch (e: IOException) {
+                        MovieListUiState.Error
+                    } catch (e: HttpException) {
+                        MovieListUiState.Error
+                    }
+                }
+                else{
                     MovieListUiState.Error
-                } catch (e: HttpException) {
-                    MovieListUiState.Error
+                    delay(2000)
+                    getTopRatedMovies()
                 }
             }
         }
@@ -83,6 +94,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
             movieListUiState = MovieListUiState.Loading
             if (isNetworkAvailable()) {
                 scheduleApiWorker("getPopularMovies")
+                lastCached = "getPopularMovies"
                 movieListUiState = try {
                     MovieListUiState.Success(moviesRepository.getPopularMovies().results)
                 } catch (e: IOException) {
@@ -91,12 +103,19 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
                     MovieListUiState.Error
                 }
             } else {
-                movieListUiState = try {
-                    MovieListUiState.Success(savedMovieRepository.getCachedMovies())
-                } catch (e: IOException) {
+                if(lastCached == "getPopularMovies"){
+                    movieListUiState = try {
+                        MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+                    } catch (e: IOException) {
+                        MovieListUiState.Error
+                    } catch (e: HttpException) {
+                        MovieListUiState.Error
+                    }
+                }
+                else{
                     MovieListUiState.Error
-                } catch (e: HttpException) {
-                    MovieListUiState.Error
+                    delay(2000)
+                    getPopularMovies()
                 }
             }
         }

@@ -35,7 +35,8 @@ fun MovieListScreen(movieListUiState: MovieListUiState,
 
         when(movieListUiState) {
             is MovieListUiState.Success -> {
-                items(movieListUiState.movies) { movie ->
+                val sortedMovies = movieListUiState.movies.sortedBy { it.title }
+                items(sortedMovies) { movie ->
                     MovieListItemCard(
                         movie = movie,
                         onMovieListItemClicked,
