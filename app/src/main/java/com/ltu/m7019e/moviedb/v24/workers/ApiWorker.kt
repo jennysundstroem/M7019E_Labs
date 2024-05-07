@@ -26,7 +26,8 @@ class ApiWorker(
                     }
                 }
                 "getTopRatedMovies" -> {
-                    val movies = container.moviesRepository.getPopularMovies().results
+                    val movies = container.moviesRepository.getTopRatedMovies().results
+                    container.savedMovieRepository.deleteCachedMovies()
                     movies.forEach { movie ->
                         container.savedMovieRepository.insertMovie(movie)
                         container.savedMovieRepository.setCachedMovie(movie.id)

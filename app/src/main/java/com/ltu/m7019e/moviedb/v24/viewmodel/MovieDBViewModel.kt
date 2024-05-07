@@ -1,11 +1,14 @@
 package com.ltu.m7019e.moviedb.v24.viewmodel
 
+import ConnectionManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import kotlin.math.log
 
 sealed interface SelectedMovieUiState {
     data class Success(
@@ -43,7 +47,11 @@ sealed interface MovieListUiState {
     object Loading : MovieListUiState
 }
 
-class MovieDBViewModel(private val moviesRepository: MoviesRepository, private val savedMovieRepository: SavedMovieRepository, private val context: Context) : ViewModel() {
+class MovieDBViewModel(
+    private val moviesRepository: MoviesRepository,
+    private val savedMovieRepository: SavedMovieRepository,
+    private val context: Context,
+    private val connectionManager: ConnectionManager) : ViewModel() {
 
     var movieListUiState: MovieListUiState by mutableStateOf(MovieListUiState.Loading)
         private set
@@ -51,75 +59,73 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     var selectedMovieUiState: SelectedMovieUiState by mutableStateOf(SelectedMovieUiState.Loading)
         private set
 
-    private var lastCached = "getPopularMovies"
+    private var lastCached : String = ""
     init {
         scheduleApiWorker("getPopularMovies")
         getPopularMovies()
     }
-
     fun getTopRatedMovies() {
         viewModelScope.launch {
-            movieListUiState = MovieListUiState.Loading
-            if (isNetworkAvailable()) {
-                scheduleApiWorker("getTopRatedMovies")
-                lastCached = "getTopRatedMovies"
-                movieListUiState = try {
-                    MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
-                } catch (e: IOException) {
-                    MovieListUiState.Error
-                } catch (e: HttpException) {
-                    MovieListUiState.Error
-                }
-            } else {
-                if(lastCached == "getTopRatedMovies"){
-                    movieListUiState = try {
-                        MovieListUiState.Success(savedMovieRepository.getCachedMovies())
-                    } catch (e: IOException) {
-                        MovieListUiState.Error
-                    } catch (e: HttpException) {
-                        MovieListUiState.Error
-                    }
-                }
-                else{
-                    MovieListUiState.Error
-                    delay(2000)
-                    getTopRatedMovies()
-                }
+            if(lastCached == "getTopRated"){
+                Log.w("myApp", "no network, but cached top rated");
+                movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+
             }
-        }
+            else if(connectionManager.isNetworkAvailable){
+                Log.w("myApp", "has network, getting top rated");
+                movieListUiState = MovieListUiState.Loading
+                scheduleApiWorker("getTopRatedMovies")
+                lastCached = "getTopRated"
+                movieListUiState = try{
+                    MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
+                }
+                catch (e: IOException){
+                    MovieListUiState.Error
+                }
+                catch (e: HttpException){
+                    MovieListUiState.Error
+                }
+
+            } else {
+                Log.w("myApp", "no network, no cached top rated");
+                MovieListUiState.Error
+                delay(2000)
+
+                }
+            getTopRatedMovies()
+            }
     }
 
     fun getPopularMovies() {
         viewModelScope.launch {
-            movieListUiState = MovieListUiState.Loading
-            if (isNetworkAvailable()) {
+            if(lastCached == "getPopular"){
+                Log.w("myApp", "no network, but cached popular");
+                movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
+            }
+            else if(connectionManager.isNetworkAvailable){
+                Log.w("myApp", "has network, getting popular");
+                movieListUiState = MovieListUiState.Loading
                 scheduleApiWorker("getPopularMovies")
-                lastCached = "getPopularMovies"
-                movieListUiState = try {
+                lastCached = "getPopular"
+                movieListUiState = try{
                     MovieListUiState.Success(moviesRepository.getPopularMovies().results)
-                } catch (e: IOException) {
-                    MovieListUiState.Error
-                } catch (e: HttpException) {
+                }
+                catch (e: IOException){
                     MovieListUiState.Error
                 }
+                catch (e: HttpException){
+                    MovieListUiState.Error
+                }
+
             } else {
-                if(lastCached == "getPopularMovies"){
-                    movieListUiState = try {
-                        MovieListUiState.Success(savedMovieRepository.getCachedMovies())
-                    } catch (e: IOException) {
-                        MovieListUiState.Error
-                    } catch (e: HttpException) {
-                        MovieListUiState.Error
-                    }
-                }
-                else{
-                    MovieListUiState.Error
-                    delay(2000)
-                    getPopularMovies()
-                }
+                Log.w("myApp", "no network, no popular");
+                MovieListUiState.Error
+                delay(2000)
+                getPopularMovies()
             }
         }
     }
+
 
     fun getSavedMovies() {
         viewModelScope.launch {
@@ -166,21 +172,20 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository, private v
     fun scheduleApiWorker(action: String) {
         savedMovieRepository.scheduelApiWorker(action)
     }
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-        return networkCapabilities != null &&
-                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-    }
+
         companion object {
             val Factory: ViewModelProvider.Factory = viewModelFactory {
                 initializer {
                     val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MovieDBApplication)
                     val moviesRepository = application.container.moviesRepository
                     val savedMovieRepository = application.container.savedMovieRepository
-                    MovieDBViewModel(moviesRepository = moviesRepository, savedMovieRepository = savedMovieRepository, context = application.applicationContext)
+                    val connectionManager = ConnectionManager(application.applicationContext)
+                    MovieDBViewModel(
+                        moviesRepository = moviesRepository,
+                        savedMovieRepository = savedMovieRepository,
+                        context = application.applicationContext,
+                        connectionManager = connectionManager)
+
                 }
             }
         }
