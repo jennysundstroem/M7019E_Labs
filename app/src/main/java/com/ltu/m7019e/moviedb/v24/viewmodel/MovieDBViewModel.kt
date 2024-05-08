@@ -21,6 +21,7 @@ import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieReview
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -71,7 +72,7 @@ class MovieDBViewModel(
                 movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
 
             }
-            else if(connectionManager.isNetworkAvailable){
+            if(connectionManager.isNetworkAvailable){
                 Log.w("myApp", "has network, getting top rated");
                 movieListUiState = MovieListUiState.Loading
                 scheduleApiWorker("getTopRatedMovies")
@@ -88,11 +89,10 @@ class MovieDBViewModel(
 
             } else {
                 Log.w("myApp", "no network, no cached top rated");
-                MovieListUiState.Error
-                delay(2000)
-
+                movieListUiState = MovieListUiState.Error
+                delay(5000)
+                getTopRatedMovies()
                 }
-            getTopRatedMovies()
             }
     }
 
@@ -102,7 +102,7 @@ class MovieDBViewModel(
                 Log.w("myApp", "no network, but cached popular");
                 movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
             }
-            else if(connectionManager.isNetworkAvailable){
+            if(connectionManager.isNetworkAvailable){
                 Log.w("myApp", "has network, getting popular");
                 movieListUiState = MovieListUiState.Loading
                 scheduleApiWorker("getPopularMovies")
@@ -119,8 +119,8 @@ class MovieDBViewModel(
 
             } else {
                 Log.w("myApp", "no network, no popular");
-                MovieListUiState.Error
-                delay(2000)
+                movieListUiState = MovieListUiState.Error
+                delay(5000)
                 getPopularMovies()
             }
         }
@@ -189,4 +189,10 @@ class MovieDBViewModel(
                 }
             }
         }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Cancel any ongoing coroutines when the ViewModel is cleared
+        viewModelScope.cancel()
+    }
     }
