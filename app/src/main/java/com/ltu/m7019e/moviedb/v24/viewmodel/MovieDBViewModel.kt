@@ -1,14 +1,10 @@
 package com.ltu.m7019e.moviedb.v24.viewmodel
 
 import ConnectionManager
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModelProvider
@@ -22,12 +18,10 @@ import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieReview
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import kotlin.math.log
 
 sealed interface SelectedMovieUiState {
     data class Success(
@@ -53,8 +47,8 @@ sealed interface MovieListUiState {
 class MovieDBViewModel(
     private val moviesRepository: MoviesRepository,
     private val savedMovieRepository: SavedMovieRepository,
-    private val context: Context,
-    private val connectionManager: ConnectionManager) : ViewModel() {
+    private val connectionManager: ConnectionManager
+) : ViewModel() {
 
     var movieListUiState: MovieListUiState by mutableStateOf(MovieListUiState.Loading)
         private set
@@ -180,7 +174,7 @@ class MovieDBViewModel(
             }
         }
     }
-    fun scheduleApiWorker(action: String) {
+    private fun scheduleApiWorker(action: String) {
         savedMovieRepository.scheduelApiWorker(action)
     }
 
@@ -194,8 +188,8 @@ class MovieDBViewModel(
                 MovieDBViewModel(
                     moviesRepository = moviesRepository,
                     savedMovieRepository = savedMovieRepository,
-                    context = application.applicationContext,
-                    connectionManager = connectionManager)
+                    connectionManager = connectionManager
+                )
 
             }
         }
