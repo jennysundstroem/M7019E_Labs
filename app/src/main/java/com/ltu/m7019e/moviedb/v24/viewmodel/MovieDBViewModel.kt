@@ -130,7 +130,7 @@ class MovieDBViewModel(
 
                 } else {
                     Log.w("myApp", "no network, no popular");
-                    movieListUiState = MovieListUiState.Error
+                    movieListUiState = MovieListUiState.NoNetwork
                     delay(2000)
                     getPopularMovies()
                 }
