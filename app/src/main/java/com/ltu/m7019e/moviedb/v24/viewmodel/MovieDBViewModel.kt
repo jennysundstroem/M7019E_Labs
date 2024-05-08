@@ -21,6 +21,7 @@ import com.ltu.m7019e.moviedb.v24.model.Movie
 import com.ltu.m7019e.moviedb.v24.model.MovieDetailResponse
 import com.ltu.m7019e.moviedb.v24.model.MovieReview
 import com.ltu.m7019e.moviedb.v24.model.MovieVideo
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,19 +61,26 @@ class MovieDBViewModel(
     var selectedMovieUiState: SelectedMovieUiState by mutableStateOf(SelectedMovieUiState.Loading)
         private set
 
+    // job for getting top rated movies
+    var getTopRatedMovieJob: Job? = null
+
+    // job for getting popular movies
+    var getPopularMovieJob: Job? = null
+
     private var lastCached : String = ""
     init {
         scheduleApiWorker("getPopularMovies")
         getPopularMovies()
     }
     fun getTopRatedMovies() {
+        getPopularMovieJob?.cancel()
+        getTopRatedMovieJob =
         viewModelScope.launch {
             if(lastCached == "getTopRated"){
                 Log.w("myApp", "no network, but cached top rated");
                 movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
-
             }
-            if(connectionManager.isNetworkAvailable){
+            else if(connectionManager.isNetworkAvailable){
                 Log.w("myApp", "has network, getting top rated");
                 movieListUiState = MovieListUiState.Loading
                 scheduleApiWorker("getTopRatedMovies")
@@ -90,19 +98,21 @@ class MovieDBViewModel(
             } else {
                 Log.w("myApp", "no network, no cached top rated");
                 movieListUiState = MovieListUiState.Error
-                delay(5000)
+                delay(2000)
                 getTopRatedMovies()
                 }
             }
     }
 
     fun getPopularMovies() {
+        getTopRatedMovieJob?.cancel()
+        getPopularMovieJob =
         viewModelScope.launch {
             if(lastCached == "getPopular"){
                 Log.w("myApp", "no network, but cached popular");
                 movieListUiState = MovieListUiState.Success(savedMovieRepository.getCachedMovies())
             }
-            if(connectionManager.isNetworkAvailable){
+            else if(connectionManager.isNetworkAvailable){
                 Log.w("myApp", "has network, getting popular");
                 movieListUiState = MovieListUiState.Loading
                 scheduleApiWorker("getPopularMovies")
@@ -120,7 +130,7 @@ class MovieDBViewModel(
             } else {
                 Log.w("myApp", "no network, no popular");
                 movieListUiState = MovieListUiState.Error
-                delay(5000)
+                delay(2000)
                 getPopularMovies()
             }
         }
@@ -189,10 +199,4 @@ class MovieDBViewModel(
                 }
             }
         }
-
-    override fun onCleared() {
-        super.onCleared()
-        // Cancel any ongoing coroutines when the ViewModel is cleared
-        viewModelScope.cancel()
-    }
     }
