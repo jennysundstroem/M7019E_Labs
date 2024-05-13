@@ -165,7 +165,7 @@ class MovieDBViewModel(
             selectedMovieUiState = SelectedMovieUiState.Loading
             selectedMovieUiState = try {
                 SelectedMovieUiState.Success(movie, moviesRepository.getMovieDetail(movie.id),
-                    moviesRepository.getVideos(movie.id).results, moviesRepository.getMovieReviews(movie.id).results, savedMovieRepository.getMovie(movie.id) != null)
+                    moviesRepository.getVideos(movie.id).results, moviesRepository.getMovieReviews(movie.id).results, savedMovieRepository.isFavorite(movie.id))
 
             } catch (e: IOException) {
                 SelectedMovieUiState.Error
