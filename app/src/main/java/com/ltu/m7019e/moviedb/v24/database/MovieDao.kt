@@ -24,4 +24,7 @@ interface MovieDao {
     suspend fun deleteCachedMovies()
     @Query("SELECT * FROM movies WHERE isCached = 1")
     suspend fun getCachedMovies(): List<Movie>
+    @Query("SELECT COUNT(*) > 0 FROM movies WHERE id = :id AND isFavourite = 1")
+    suspend fun isFavorite(id: Long): Boolean
+
 }

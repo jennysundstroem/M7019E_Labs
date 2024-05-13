@@ -53,6 +53,7 @@ interface SavedMovieRepository {
     suspend fun deleteCachedMovies()
     suspend fun setFavouriteMovie(id: Long)
     suspend fun setCachedMovie(id: Long)
+    suspend fun isFavorite(id : Long): Boolean
     abstract fun scheduelApiWorker(action: String)
 
 }
@@ -90,6 +91,10 @@ class FavoriteMoviesRepository(private val movieDao: MovieDao, context: Context)
 
     override suspend fun setCachedMovie(id: Long) {
         return movieDao.setCachedMovie(id)
+    }
+
+    override suspend fun isFavorite(id: Long): Boolean {
+        return movieDao.isFavorite(id)
     }
     override fun scheduelApiWorker(action: String) {
         val inputData = workDataOf("action" to action)

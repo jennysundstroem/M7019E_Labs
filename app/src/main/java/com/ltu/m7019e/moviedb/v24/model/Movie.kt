@@ -16,10 +16,10 @@ data class Movie(
     var title: String,
 
     @SerialName(value = "poster_path")
-    var posterPath: String,
+    var posterPath: String? = null,
 
     @SerialName(value = "backdrop_path")
-    var backdropPath: String,
+    var backdropPath: String? = null,
 
     @SerialName(value = "release_date")
     var releaseDate: String,
